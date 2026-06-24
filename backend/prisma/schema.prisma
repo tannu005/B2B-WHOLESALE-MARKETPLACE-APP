@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             Int       @id @default(autoincrement())
+  email          String    @unique
+  password       String
+  name           String
+  role           String    @default("RETAILER") // "ADMIN", "SELLER", "RETAILER", "DELIVERY"
+  isApproved     Boolean   @default(false)
+  commissionRate Float     @default(10.0) // percentage commission for sellers
+  balance        Float     @default(0.0)  // earnings for sellers and delivery partners
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  
+  // Relations
+  orders         Order[]   @relation("BuyerOrders")
+  deliveries     Order[]   @relation("DeliveryPartner")
+  sellerOrders   Order[]   @relation("SellerOrders")
+  products       Product[] @relation("SellerProducts")
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  products  Product[]
+}
+
+model Product {
+  id             Int         @id @default(autoincrement())
+  title          String
+  description    String
+  price          Float
+  wholesalePrice Float
+  bulkThreshold  Int         @default(10)
+  stock          Int         @default(0)
+  imageUrl       String?
+  categoryId     Int
+  category       Category    @relation(fields: [categoryId], references: [id])
+  sellerId       Int
+  seller         User        @relation("SellerProducts", fields: [sellerId], references: [id], onDelete: Cascade)
+  isApproved     Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  orderItems     OrderItem[]
+}
+
+model Order {
+  id                Int         @id @default(autoincrement())
+  buyerId           Int
+  buyer             User        @relation("BuyerOrders", fields: [buyerId], references: [id])
+  sellerId          Int
+  seller            User        @relation("SellerOrders", fields: [sellerId], references: [id])
+  deliveryPartnerId Int?
+  deliveryPartner   User?       @relation("DeliveryPartner", fields: [deliveryPartnerId], references: [id])
+  status            String      @default("PENDING") // "PENDING", "ACCEPTED", "IN_TRANSIT", "DELIVERED", "REJECTED"
+  totalAmount       Float
+  items             OrderItem[]
+  address           String?
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+  isPaid            Boolean     @default(false)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  orderId    Int
+  order      Order    @relation(fields: [orderId], references: [id])
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  quantity   Int
+  priceAtBuy Float
+}
+

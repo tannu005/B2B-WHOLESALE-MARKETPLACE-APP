@@ -1,0 +1,495 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap');
+
+:root {
+  /* Jewelry-Inspired Saree Theme */
+  --color-primary: #1A1A1A; /* Almost Black for stark elegance */
+  --color-secondary: #C5A059; /* Muted Champagne Gold */
+  --color-background: #FCFCFC; /* Pure, stark off-white */
+  --color-surface: #FFFFFF;
+  --color-text-main: #222222;
+  --color-text-muted: #888888;
+  --color-border: #EAEAEA;
+  
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'Montserrat', sans-serif;
+  
+  /* Minimalist Shadows */
+  --shadow-sm: 0 4px 20px rgba(0,0,0,0.03);
+  --shadow-md: 0 10px 40px rgba(0,0,0,0.05);
+  
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  
+  --transition: all 0.4s ease-in-out;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-text-main);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 300;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-sans);
+  border: none;
+  background: none;
+  transition: var(--transition);
+}
+
+/* Minimalist Utilities */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 1rem 2.5rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  border: 1px solid var(--color-primary);
+}
+
+.btn-primary:hover {
+  background-color: transparent;
+  color: var(--color-primary);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  padding: 1rem 2.5rem;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-background);
+}
+
+.card {
+  background: var(--color-surface);
+  transition: var(--transition);
+  border: 1px solid transparent;
+}
+
+.card:hover {
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+/* Layout Utilities */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+.gap-8 { gap: 2rem; }
+
+/* Thin Nav */
+.nav-link {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--color-primary);
+  transition: var(--transition);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Luxury Input Fields */
+.luxury-input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.luxury-input:focus {
+  border-color: var(--color-secondary);
+}
+
+.luxury-select {
+  width: 100%;
+  padding: 0.85rem 2.75rem 0.85rem 2.75rem;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  outline: none;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  appearance: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.luxury-select:focus {
+  border-color: var(--color-secondary);
+}
+
+/* Back to store custom link */
+.back-to-store-link {
+  color: #FFFFFF !important;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+}
+
+.back-to-store-link:hover {
+  color: var(--color-secondary) !important;
+  border-bottom-color: var(--color-secondary);
+}
+
+/* Credentials Accordion styling */
+.credentials-accordion {
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  border-radius: var(--radius-sm);
+  background: rgba(252, 250, 247, 0.5);
+  margin-top: 1.5rem;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.credentials-header {
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  background: rgba(197, 160, 89, 0.08);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-primary);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.credentials-header:hover {
+  background: rgba(197, 160, 89, 0.15);
+}
+
+.credentials-content {
+  padding: 1rem;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  border-top: 1px solid rgba(197, 160, 89, 0.15);
+  background: #FFFFFF;
+}
+
+.credentials-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.credentials-table th, .credentials-table td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.credentials-table th {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.credentials-table td {
+  color: var(--color-text-main);
+  font-size: 0.7rem;
+}
+
+.credentials-table tr:last-child td {
+  border-bottom: none;
+}
+
+.credentials-copy-btn {
+  color: var(--color-secondary);
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 0.7rem;
+  padding: 0;
+}
+.credentials-copy-btn:hover {
+  color: var(--color-primary);
+}
+
+/* Toast Notifications */
+.toast-container {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 400px;
+  width: calc(100% - 4rem);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: all 0.3s ease;
+  border-left: 3px solid var(--color-primary);
+}
+
+.toast-success {
+  border-left-color: var(--color-secondary);
+}
+
+.toast-error {
+  border-left-color: #D32F2F;
+}
+
+.toast-warning {
+  border-left-color: #F57C00;
+}
+
+.toast-info {
+  border-left-color: #1976D2;
+}
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--color-text-main);
+  line-height: 1.4;
+  flex: 1;
+}
+
+.toast-close {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px;
+  background: none;
+  border: none;
+  transition: var(--transition);
+}
+
+.toast-close:hover {
+  color: var(--color-primary);
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+/* Luxury Product Card (Dribbble Jewelry layout) */
+.luxury-product-card {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.luxury-product-image-container {
+  position: relative;
+  width: 100%;
+  padding-bottom: 125%; /* 4:5 Portrait Aspect Ratio */
+  background-color: #FAF8F5; /* Warm off-white frame */
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  transition: var(--transition);
+}
+
+.luxury-product-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-product-card:hover .luxury-product-image {
+  transform: scale(1.05);
+}
+
+.luxury-product-badge {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  padding: 0.35rem 0.65rem;
+  font-size: 0.6rem;
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.luxury-product-info {
+  padding: 1.25rem 0 0.5rem 0; /* clean spacing, no box padding */
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.luxury-product-category {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.luxury-product-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  color: var(--color-primary);
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.3;
+  transition: var(--transition);
+}
+
+.luxury-product-card:hover .luxury-product-title {
+  color: var(--color-secondary);
+}
+
+.luxury-product-description {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0.25rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.luxury-product-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(0, 0, 0, 0.05);
+}
+
+.luxury-price-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+}
+
+.luxury-price-amount {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--color-text-main);
+}
+
+.luxury-price-wholesale-amount {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-secondary);
+}
+
+
+
