@@ -27,6 +27,12 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
 body {
@@ -36,6 +42,10 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   font-weight: 300;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-text-size-adjust: 100%;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -1422,5 +1432,142 @@ button {
   }
   .showcase-editorial-content h2 {
     font-size: 2rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE APP RESPONSIVE — Fits screen like a native app
+   ══════════════════════════════════════════════════════ */
+
+/* ── Tablets & Small Laptops ── */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.85rem 1.5rem;
+    font-size: 0.7rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Make grids stack on mobile */
+  [style*="gridTemplateColumns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Login card - full width on mobile */
+  .card.animate-fade-in {
+    padding: 2rem 1.5rem !important;
+    max-width: 100% !important;
+    margin: 0 0.5rem;
+  }
+
+  /* Luxury inputs - mobile friendly size */
+  .luxury-input,
+  .luxury-select {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+  }
+}
+
+/* ── Mobile Phones ── */
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.8rem !important;
+  }
+
+  h2 {
+    font-size: 1.4rem !important;
+  }
+
+  /* Hero section - mobile fit */
+  header {
+    height: 100svh !important; /* svh = small viewport height, accounts for mobile browser chrome */
+  }
+
+  /* Product cards - single column, full width */
+  .scroll-card {
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  /* Footer grid - stack on mobile */
+  footer .container {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+    text-align: center;
+  }
+
+  /* Seller dashboard sidebar */
+  [style*="width: 280px"],
+  [style*="width: 260px"] {
+    width: 100% !important;
+    position: relative !important;
+    height: auto !important;
+  }
+
+  /* Dashboard grid - stack panels */
+  [style*="marginLeft: 280px"],
+  [style*="marginLeft: 260px"] {
+    margin-left: 0 !important;
+  }
+
+  /* Order cards - full width */
+  [style*="minmax(450px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Modal/popup - mobile full width */
+  [style*="position: fixed"] > [style*="maxWidth"] {
+    max-width: calc(100vw - 2rem) !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Category buttons - wrap nicely */
+  [style*="flexWrap: 'wrap'"] {
+    gap: 0.5rem !important;
+  }
+
+  [style*="flexWrap: 'wrap'"] button {
+    font-size: 0.65rem !important;
+    padding: 0.5rem 0.8rem !important;
+  }
+
+  /* Notification bell dropdown */
+  [style*="width: 350px"] {
+    width: calc(100vw - 2rem) !important;
+    right: -1rem !important;
+  }
+}
+
+/* ── Very Small Phones ── */
+@media (max-width: 360px) {
+  h1 {
+    font-size: 1.5rem !important;
+    letter-spacing: 4px !important;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.7rem 1rem;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+  }
+}
+
+/* ── Landscape Mobile ── */
+@media (max-height: 500px) and (orientation: landscape) {
+  header {
+    height: auto !important;
+    min-height: 100svh;
+    padding: 2rem 0 !important;
   }
 }
