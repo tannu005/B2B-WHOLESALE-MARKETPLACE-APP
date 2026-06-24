@@ -385,7 +385,7 @@ export default function DeliveryDashboard() {
             </p>
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(450px, 1fr))', gap: '2.5rem' }}>
+          <div className="shipment-grid" style={{ gap: '2.5rem' }}>
             {filteredOrders.map((order) => (
               <div key={order.id} className="card" style={{ 
                 border: '1px solid var(--color-border)', 

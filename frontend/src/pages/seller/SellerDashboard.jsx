@@ -712,86 +712,88 @@ export default function SellerDashboard({ isAdmin = false }) {
           <div className="card animate-fade-in" style={{ border: '1px solid var(--color-border)', padding: '2.5rem' }}>
             <h2 style={{ marginBottom: '2rem', fontSize: '1.6rem' }}>B2B Wholesale Partners</h2>
             
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                  <th style={{ padding: '1rem 0' }}>Name</th>
-                  <th style={{ padding: '1rem 0' }}>Email</th>
-                  <th style={{ padding: '1rem 0' }}>Role</th>
-                  <th style={{ padding: '1rem 0' }}>Approved State</th>
-                  <th style={{ padding: '1rem 0' }}>Balance</th>
-                  <th style={{ padding: '1rem 0' }}>Commission Rate</th>
-                  <th style={{ padding: '1rem 0', textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {usersList.filter(u => u.role !== 'ADMIN').map((partner) => (
-                  <tr key={partner.id} style={{ borderBottom: '1px solid #F5F5F5', fontSize: '0.9rem' }}>
-                    <td style={{ padding: '1.25rem 0', fontWeight: '500' }}>{partner.name}</td>
-                    <td style={{ padding: '1.25rem 0' }}>{partner.email}</td>
-                    <td style={{ padding: '1.25rem 0' }}>
-                      <span style={{ 
-                        fontSize: '0.75rem', fontWeight: 600, padding: '0.1rem 0.4rem', 
-                        borderRadius: '2px', backgroundColor: partner.role === 'SELLER' ? '#E1BEE7' : partner.role === 'DELIVERY' ? '#B2DFDB' : '#ECEFF1',
-                        color: partner.role === 'SELLER' ? '#4A148C' : partner.role === 'DELIVERY' ? '#004D40' : '#37474F'
-                      }}>{partner.role}</span>
-                    </td>
-                    <td style={{ padding: '1.25rem 0' }}>
-                      {partner.isApproved ? (
-                        <span style={{ color: 'green', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <CheckCircle size={16} /> Approved
-                        </span>
-                      ) : (
-                        <span style={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                          <XCircle size={16} /> Blocked/Pending
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '1.25rem 0' }}>₹{partner.balance.toLocaleString()}</td>
-                    <td style={{ padding: '1.25rem 0' }}>
-                      {partner.role === 'SELLER' ? (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <input 
-                            type="number"
-                            step="0.1"
-                            value={editingCommissionRate[partner.id] !== undefined ? editingCommissionRate[partner.id] : partner.commissionRate}
-                            onChange={(e) => setEditingCommissionRate({
-                              ...editingCommissionRate,
-                              [partner.id]: e.target.value
-                            })}
-                            style={{ width: '60px', padding: '0.25rem', border: '1px solid var(--color-border)', borderRadius: '2px' }}
-                          />
-                          <span>%</span>
-                          <button 
-                            onClick={() => handleApproveUser(partner.id, partner.isApproved, editingCommissionRate[partner.id])}
-                            style={{ fontSize: '0.75rem', color: 'var(--color-secondary)', textDecoration: 'underline' }}
-                          >
-                            Save
-                          </button>
-                        </div>
-                      ) : '-'}
-                    </td>
-                    <td style={{ padding: '1.25rem 0', textAlign: 'right' }}>
-                      {partner.isApproved ? (
-                        <button 
-                          onClick={() => handleApproveUser(partner.id, false)}
-                          style={{ padding: '0.4rem 0.85rem', backgroundColor: '#FFEBEE', color: '#C62828', borderRadius: '2px', fontSize: '0.8rem' }}
-                        >
-                          Revoke Approval
-                        </button>
-                      ) : (
-                        <button 
-                          onClick={() => handleApproveUser(partner.id, true)}
-                          style={{ padding: '0.4rem 0.85rem', backgroundColor: '#E8F5E9', color: '#2E7D32', borderRadius: '2px', fontSize: '0.8rem', fontWeight: 600 }}
-                        >
-                          Approve Partner
-                        </button>
-                      )}
-                    </td>
+            <div className="table-responsive">
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                    <th style={{ padding: '1rem 0' }}>Name</th>
+                    <th style={{ padding: '1rem 0' }}>Email</th>
+                    <th style={{ padding: '1rem 0' }}>Role</th>
+                    <th style={{ padding: '1rem 0' }}>Approved State</th>
+                    <th style={{ padding: '1rem 0' }}>Balance</th>
+                    <th style={{ padding: '1rem 0' }}>Commission Rate</th>
+                    <th style={{ padding: '1rem 0', textAlign: 'right' }}>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {usersList.filter(u => u.role !== 'ADMIN').map((partner) => (
+                    <tr key={partner.id} style={{ borderBottom: '1px solid #F5F5F5', fontSize: '0.9rem' }}>
+                      <td style={{ padding: '1.25rem 0', fontWeight: '500' }}>{partner.name}</td>
+                      <td style={{ padding: '1.25rem 0' }}>{partner.email}</td>
+                      <td style={{ padding: '1.25rem 0' }}>
+                        <span style={{ 
+                          fontSize: '0.75rem', fontWeight: 600, padding: '0.1rem 0.4rem', 
+                          borderRadius: '2px', backgroundColor: partner.role === 'SELLER' ? '#E1BEE7' : partner.role === 'DELIVERY' ? '#B2DFDB' : '#ECEFF1',
+                          color: partner.role === 'SELLER' ? '#4A148C' : partner.role === 'DELIVERY' ? '#004D40' : '#37474F'
+                        }}>{partner.role}</span>
+                      </td>
+                      <td style={{ padding: '1.25rem 0' }}>
+                        {partner.isApproved ? (
+                          <span style={{ color: 'green', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            <CheckCircle size={16} /> Approved
+                          </span>
+                        ) : (
+                          <span style={{ color: 'var(--color-text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                            <XCircle size={16} /> Blocked/Pending
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ padding: '1.25rem 0' }}>₹{partner.balance.toLocaleString()}</td>
+                      <td style={{ padding: '1.25rem 0' }}>
+                        {partner.role === 'SELLER' ? (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <input 
+                              type="number"
+                              step="0.1"
+                              value={editingCommissionRate[partner.id] !== undefined ? editingCommissionRate[partner.id] : partner.commissionRate}
+                              onChange={(e) => setEditingCommissionRate({
+                                ...editingCommissionRate,
+                                [partner.id]: e.target.value
+                              })}
+                              style={{ width: '60px', padding: '0.25rem', border: '1px solid var(--color-border)', borderRadius: '2px' }}
+                            />
+                            <span>%</span>
+                            <button 
+                              onClick={() => handleApproveUser(partner.id, partner.isApproved, editingCommissionRate[partner.id])}
+                              style={{ fontSize: '0.75rem', color: 'var(--color-secondary)', textDecoration: 'underline' }}
+                            >
+                              Save
+                            </button>
+                          </div>
+                        ) : '-'}
+                      </td>
+                      <td style={{ padding: '1.25rem 0', textAlign: 'right' }}>
+                        {partner.isApproved ? (
+                          <button 
+                            onClick={() => handleApproveUser(partner.id, false)}
+                            style={{ padding: '0.4rem 0.85rem', backgroundColor: '#FFEBEE', color: '#C62828', borderRadius: '2px', fontSize: '0.8rem' }}
+                          >
+                            Revoke Approval
+                          </button>
+                        ) : (
+                          <button 
+                            onClick={() => handleApproveUser(partner.id, true)}
+                            style={{ padding: '0.4rem 0.85rem', backgroundColor: '#E8F5E9', color: '#2E7D32', borderRadius: '2px', fontSize: '0.8rem', fontWeight: 600 }}
+                          >
+                            Approve Partner
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -819,86 +821,88 @@ export default function SellerDashboard({ isAdmin = false }) {
               {products.length === 0 ? (
                 <p style={{ color: 'var(--color-text-muted)' }}>No products found in this category.</p>
               ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                      <th style={{ padding: '1rem 0' }}>Saree Preview</th>
-                      <th style={{ padding: '1rem 0' }}>Title</th>
-                      {isAdmin && <th style={{ padding: '1rem 0' }}>Weaver (Seller)</th>}
-                      <th style={{ padding: '1rem 0' }}>Category</th>
-                      <th style={{ padding: '1rem 0' }}>Stock</th>
-                      <th style={{ padding: '1rem 0' }}>Retail price</th>
-                      <th style={{ padding: '1rem 0' }}>Wholesale Price</th>
-                      <th style={{ padding: '1rem 0' }}>Bulk Min.</th>
-                      <th style={{ padding: '1rem 0' }}>Verification Status</th>
-                      <th style={{ padding: '1rem 0', textAlign: 'right' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((p) => (
-                      <tr key={p.id} style={{ borderBottom: '1px solid #F5F5F5', fontSize: '0.9rem' }}>
-                        <td style={{ padding: '1rem 0' }}>
-                          <div style={{ 
-                            width: '45px', 
-                            height: '55px', 
-                            background: `url("${p.imageUrl || '/hero.png'}") center/cover no-repeat`,
-                            border: '1px solid var(--color-border)' 
-                          }}></div>
-                        </td>
-                        <td style={{ padding: '1.25rem 0', fontWeight: '500' }}>{p.title}</td>
-                        {isAdmin && <td style={{ padding: '1.25rem 0' }}>{p.seller?.name || `ID: ${p.sellerId}`}</td>}
-                        <td style={{ padding: '1.25rem 0' }}>{p.category?.name}</td>
-                        <td style={{ padding: '1.25rem 0', fontWeight: p.stock < 10 ? 600 : 400, color: p.stock < 10 ? 'red' : 'inherit' }}>
-                          {p.stock} units
-                        </td>
-                        <td style={{ padding: '1.25rem 0' }}>₹{p.price.toLocaleString()}</td>
-                        <td style={{ padding: '1.25rem 0', fontWeight: '600', color: 'var(--color-secondary)' }}>₹{p.wholesalePrice.toLocaleString()}</td>
-                        <td style={{ padding: '1.25rem 0' }}>{p.bulkThreshold} sarees</td>
-                        <td style={{ padding: '1.25rem 0' }}>
-                          {p.isApproved ? (
-                            <span style={{ color: 'green', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem' }}>
-                              <CheckCircle size={14} /> Approved
-                            </span>
-                          ) : (
-                            <span style={{ color: '#EF6C00', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem', fontWeight: 500 }}>
-                              <AlertCircle size={14} /> Pending Review
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ padding: '1.25rem 0', textAlign: 'right' }}>
-                          {isAdmin ? (
-                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                              {p.isApproved ? (
-                                <button 
-                                  onClick={() => handleApproveProduct(p.id, false)}
-                                  style={{ padding: '0.35rem 0.75rem', backgroundColor: '#FFEBEE', color: '#C62828', borderRadius: '2px', fontSize: '0.75rem' }}
-                                >
-                                  Reject
-                                </button>
-                              ) : (
-                                <button 
-                                  onClick={() => handleApproveProduct(p.id, true)}
-                                  style={{ padding: '0.35rem 0.75rem', backgroundColor: '#E8F5E9', color: '#2E7D32', borderRadius: '2px', fontSize: '0.75rem', fontWeight: 600 }}
-                                >
-                                  Approve Saree
-                                </button>
-                              )}
-                            </div>
-                          ) : (
-                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', color: 'var(--color-text-muted)' }}>
-                              <button onClick={() => handleEditProductClick(p)} style={{ color: 'var(--color-text-main)' }}>
-                                <Edit2 size={16} />
-                              </button>
-                              <button onClick={() => handleDeleteProduct(p.id)} style={{ color: '#D32F2F' }}>
-                                <Trash2 size={16} />
-                              </button>
-                            </div>
-                          )}
-                        </td>
+                <div className="table-responsive">
+                  <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                        <th style={{ padding: '1rem 0' }}>Saree Preview</th>
+                        <th style={{ padding: '1rem 0' }}>Title</th>
+                        {isAdmin && <th style={{ padding: '1rem 0' }}>Weaver (Seller)</th>}
+                        <th style={{ padding: '1rem 0' }}>Category</th>
+                        <th style={{ padding: '1rem 0' }}>Stock</th>
+                        <th style={{ padding: '1rem 0' }}>Retail price</th>
+                        <th style={{ padding: '1rem 0' }}>Wholesale Price</th>
+                        <th style={{ padding: '1rem 0' }}>Bulk Min.</th>
+                        <th style={{ padding: '1rem 0' }}>Verification Status</th>
+                        <th style={{ padding: '1rem 0', textAlign: 'right' }}>Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {products.map((p) => (
+                        <tr key={p.id} style={{ borderBottom: '1px solid #F5F5F5', fontSize: '0.9rem' }}>
+                          <td style={{ padding: '1rem 0' }}>
+                            <div style={{ 
+                              width: '45px', 
+                              height: '55px', 
+                              background: `url("${p.imageUrl || '/hero.png'}") center/cover no-repeat`,
+                              border: '1px solid var(--color-border)' 
+                            }}></div>
+                          </td>
+                          <td style={{ padding: '1.25rem 0', fontWeight: '500' }}>{p.title}</td>
+                          {isAdmin && <td style={{ padding: '1.25rem 0' }}>{p.seller?.name || `ID: ${p.sellerId}`}</td>}
+                          <td style={{ padding: '1.25rem 0' }}>{p.category?.name}</td>
+                          <td style={{ padding: '1.25rem 0', fontWeight: p.stock < 10 ? 600 : 400, color: p.stock < 10 ? 'red' : 'inherit' }}>
+                            {p.stock} units
+                          </td>
+                          <td style={{ padding: '1.25rem 0' }}>₹{p.price.toLocaleString()}</td>
+                          <td style={{ padding: '1.25rem 0', fontWeight: '600', color: 'var(--color-secondary)' }}>₹{p.wholesalePrice.toLocaleString()}</td>
+                          <td style={{ padding: '1.25rem 0' }}>{p.bulkThreshold} sarees</td>
+                          <td style={{ padding: '1.25rem 0' }}>
+                            {p.isApproved ? (
+                              <span style={{ color: 'green', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem' }}>
+                                <CheckCircle size={14} /> Approved
+                              </span>
+                            ) : (
+                              <span style={{ color: '#EF6C00', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem', fontWeight: 500 }}>
+                                <AlertCircle size={14} /> Pending Review
+                              </span>
+                            )}
+                          </td>
+                          <td style={{ padding: '1.25rem 0', textAlign: 'right' }}>
+                            {isAdmin ? (
+                              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                {p.isApproved ? (
+                                  <button 
+                                    onClick={() => handleApproveProduct(p.id, false)}
+                                    style={{ padding: '0.35rem 0.75rem', backgroundColor: '#FFEBEE', color: '#C62828', borderRadius: '2px', fontSize: '0.75rem' }}
+                                  >
+                                    Reject
+                                  </button>
+                                ) : (
+                                  <button 
+                                    onClick={() => handleApproveProduct(p.id, true)}
+                                    style={{ padding: '0.35rem 0.75rem', backgroundColor: '#E8F5E9', color: '#2E7D32', borderRadius: '2px', fontSize: '0.75rem', fontWeight: 600 }}
+                                  >
+                                    Approve Saree
+                                  </button>
+                                )}
+                              </div>
+                            ) : (
+                              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', color: 'var(--color-text-muted)' }}>
+                                <button onClick={() => handleEditProductClick(p)} style={{ color: 'var(--color-text-main)' }}>
+                                  <Edit2 size={16} />
+                                </button>
+                                <button onClick={() => handleDeleteProduct(p.id)} style={{ color: '#D32F2F' }}>
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           </div>
@@ -1036,7 +1040,7 @@ export default function SellerDashboard({ isAdmin = false }) {
             TAB: ADMIN CATEGORIES MANAGEMENT
             ========================================== */}
         {isAdmin && activeTab === 'categories' && (
-          <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '3rem' }}>
+          <div className="admin-categories-grid animate-fade-in" style={{ gap: '3rem' }}>
             <div className="card" style={{ border: '1px solid var(--color-border)', padding: '2.5rem', height: 'fit-content' }}>
               <h3 style={{ marginBottom: '1.5rem' }}>Create Product Category</h3>
               <form onSubmit={handleAddCategory} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -1057,22 +1061,24 @@ export default function SellerDashboard({ isAdmin = false }) {
 
             <div className="card" style={{ border: '1px solid var(--color-border)', padding: '2.5rem' }}>
               <h3 style={{ marginBottom: '1.5rem' }}>Available Categories</h3>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-                    <th style={{ padding: '0.75rem 0' }}>ID</th>
-                    <th style={{ padding: '0.75rem 0' }}>Category Name</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {categories.map((cat) => (
-                    <tr key={cat.id} style={{ borderBottom: '1px solid #F5F5F5', fontSize: '0.9rem' }}>
-                      <td style={{ padding: '1rem 0' }}>{cat.id}</td>
-                      <td style={{ padding: '1rem 0', fontWeight: '500' }}>{cat.name}</td>
+              <div className="table-responsive">
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--color-border)', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
+                      <th style={{ padding: '0.75rem 0' }}>ID</th>
+                      <th style={{ padding: '0.75rem 0' }}>Category Name</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {categories.map((cat) => (
+                      <tr key={cat.id} style={{ borderBottom: '1px solid #F5F5F5', fontSize: '0.9rem' }}>
+                        <td style={{ padding: '1rem 0' }}>{cat.id}</td>
+                        <td style={{ padding: '1rem 0', fontWeight: '500' }}>{cat.name}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
