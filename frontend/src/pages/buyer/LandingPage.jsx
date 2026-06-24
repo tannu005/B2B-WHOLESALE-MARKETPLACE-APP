@@ -792,7 +792,7 @@ export default function LandingPage() {
           {/* Category Tabs & Grid */}
           <section id="collections-section" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(8px)', padding: '5rem 0 8rem 0' }}>
             <main className="container" style={{ padding: 0 }}>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+            <div className="category-filters-container">
               <button 
                 onClick={() => { setSelectedCategory(''); setSearchQuery(''); }}
                 className={!selectedCategory ? 'btn-primary' : 'btn-secondary'}

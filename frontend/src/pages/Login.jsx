@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
-import { Lock, Mail, User, Shield, AlertCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, User, Shield, AlertCircle, ArrowLeft, Eye, EyeOff, Navigation } from 'lucide-react';
+import { Geolocation } from '@capacitor/geolocation';
 
-export default function Login() {
+export default function Login({ appMode = 'web', setAppMode }) {
   const navigate = useNavigate();
   const { login, register } = useAuth();
   const { toast } = useToast();
@@ -13,7 +14,18 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [role, setRole] = useState('RETAILER');
+  
+  // App-specific defaults
+  const getInitialRole = () => {
+    if (appMode === 'seller') return 'SELLER';
+    if (appMode === 'delivery') return 'DELIVERY';
+    return 'RETAILER';
+  };
+  const [role, setRole] = useState(getInitialRole());
+  
+  // Gatekeeper Selected Role ('SELLER' or 'ADMIN') for SellerApp login
+  const [gatekeeperRole, setGatekeeperRole] = useState('SELLER');
+  
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +37,12 @@ export default function Login() {
 
     try {
       if (isRegister) {
-        const user = await register(name, email, password, role);
+        // Enforce role constraints for specific app modes during registration
+        let registrationRole = role;
+        if (appMode === 'seller') registrationRole = 'SELLER';
+        if (appMode === 'delivery') registrationRole = 'DELIVERY';
+
+        const user = await register(name, email, password, registrationRole);
         if (user.role === 'SELLER' || user.role === 'DELIVERY') {
           setError('Registration successful! Please wait for Admin approval before logging in.');
           setIsRegister(false);
@@ -34,12 +51,49 @@ export default function Login() {
         }
       } else {
         const user = await login(email, password);
-        if (!user.isApproved) {
+        
+        // Approve check (Admins are always approved)
+        if (user.role !== 'ADMIN' && !user.isApproved) {
           setError('Your account is pending admin approval.');
           setLoading(false);
           return;
         }
 
+        // 1. Role validation based on App Mode / Gatekeeper selection
+        if (appMode === 'seller') {
+          if (gatekeeperRole === 'ADMIN' && user.role !== 'ADMIN') {
+            setError('Access Denied: You do not have administrator credentials.');
+            setLoading(false);
+            return;
+          }
+          if (gatekeeperRole === 'SELLER' && user.role !== 'SELLER') {
+            setError('Access Denied: You do not have seller credentials.');
+            setLoading(false);
+            return;
+          }
+        } else if (appMode === 'delivery') {
+          if (user.role !== 'DELIVERY') {
+            setError('Access Denied: You do not have delivery partner credentials.');
+            setLoading(false);
+            return;
+          }
+        }
+
+        // 2. Request Location Permissions if Delivery Partner
+        if (user.role === 'DELIVERY') {
+          try {
+            toast.info('Requesting GPS location permissions for delivery tracking...');
+            const perm = await Geolocation.requestPermissions();
+            console.log('GPS Permission Response:', perm);
+            if (perm.location !== 'granted') {
+              toast.warning('GPS permission is required to accept and track deliveries.');
+            }
+          } catch (gpsError) {
+            console.warn('Geolocation request rejected or not supported on this device:', gpsError);
+          }
+        }
+
+        // 3. Routing
         if (user.role === 'SELLER') {
           navigate('/seller');
         } else if (user.role === 'ADMIN') {
@@ -57,6 +111,16 @@ export default function Login() {
     }
   };
 
+  // Helper for localhost mode switching
+  const handleDevModeSwitch = (mode) => {
+    if (setAppMode) {
+      setAppMode(mode);
+      localStorage.setItem('dev_app_mode', mode);
+      setRole(mode === 'seller' ? 'SELLER' : mode === 'delivery' ? 'DELIVERY' : 'RETAILER');
+      setError('');
+    }
+  };
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -67,13 +131,35 @@ export default function Login() {
       padding: '3rem 2rem',
       position: 'relative'
     }}>
-      <Link to="/" className="back-to-store-link" style={{
-        position: 'absolute',
-        top: '2.5rem',
-        left: '2.5rem',
-      }}>
-        <ArrowLeft size={16} style={{ color: 'var(--color-secondary)' }} /> Back to Store
-      </Link>
+      {appMode === 'buyer' || appMode === 'web' ? (
+        <Link to="/" className="back-to-store-link" style={{
+          position: 'absolute',
+          top: '2.5rem',
+          left: '2.5rem',
+        }}>
+          <ArrowLeft size={16} style={{ color: 'var(--color-secondary)' }} /> Back to Store
+        </Link>
+      ) : null}
+      
+      {/* Dev Mode Switcher on Localhost */}
+      {!window.Capacitor?.isNative && (
+        <div style={{
+          position: 'absolute',
+          top: '1rem',
+          right: '1rem',
+          background: 'rgba(0,0,0,0.8)',
+          padding: '0.75rem',
+          borderRadius: '4px',
+          display: 'flex',
+          gap: '0.5rem',
+          zIndex: 100
+        }}>
+          <span style={{ color: '#aaa', fontSize: '0.75rem', alignSelf: 'center', marginRight: '0.25rem' }}>Dev Mode:</span>
+          <button onClick={() => handleDevModeSwitch('buyer')} style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', background: appMode === 'buyer' ? 'var(--color-secondary)' : '#333', color: 'white', border: 'none', borderRadius: '2px', cursor: 'pointer' }}>Buyer</button>
+          <button onClick={() => handleDevModeSwitch('seller')} style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', background: appMode === 'seller' ? 'var(--color-secondary)' : '#333', color: 'white', border: 'none', borderRadius: '2px', cursor: 'pointer' }}>Seller/Admin</button>
+          <button onClick={() => handleDevModeSwitch('delivery')} style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', background: appMode === 'delivery' ? 'var(--color-secondary)' : '#333', color: 'white', border: 'none', borderRadius: '2px', cursor: 'pointer' }}>Delivery</button>
+        </div>
+      )}
       
       <div className="card animate-fade-in" style={{
         width: '100%',
@@ -112,9 +198,64 @@ export default function Login() {
             textTransform: 'uppercase',
             fontWeight: '500'
           }}>
-            {isRegister ? 'B2B Wholesale Registration' : 'B2B Wholesale Portal'}
+            {appMode === 'seller' ? (
+              isRegister ? 'B2B Wholesale Registration' : 'Gatekeeper: Seller & Admin Portal'
+            ) : appMode === 'delivery' ? (
+              isRegister ? 'Delivery Partner Registration' : 'Logistics Driver Portal'
+            ) : (
+              isRegister ? 'B2B Wholesale Registration' : 'B2B Wholesale Portal'
+            )}
           </p>
         </div>
+
+        {/* Gatekeeper Role Selector Segmented Control */}
+        {appMode === 'seller' && !isRegister && (
+          <div style={{
+            display: 'flex',
+            background: '#eee',
+            borderRadius: '4px',
+            padding: '2px',
+            marginBottom: '1.5rem',
+            border: '1px solid #ddd'
+          }}>
+            <button
+              type="button"
+              onClick={() => setGatekeeperRole('SELLER')}
+              style={{
+                flex: 1,
+                padding: '0.6rem',
+                border: 'none',
+                borderRadius: '3px',
+                background: gatekeeperRole === 'SELLER' ? 'var(--color-primary)' : 'transparent',
+                color: gatekeeperRole === 'SELLER' ? 'white' : 'var(--color-text-main)',
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Weaver / Seller
+            </button>
+            <button
+              type="button"
+              onClick={() => setGatekeeperRole('ADMIN')}
+              style={{
+                flex: 1,
+                padding: '0.6rem',
+                border: 'none',
+                borderRadius: '3px',
+                background: gatekeeperRole === 'ADMIN' ? 'var(--color-primary)' : 'transparent',
+                color: gatekeeperRole === 'ADMIN' ? 'white' : 'var(--color-text-main)',
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              Administrator
+            </button>
+          </div>
+        )}
 
         {error && (
           <div style={{
@@ -269,7 +410,7 @@ export default function Login() {
             </div>
           </div>
 
-          {isRegister && (
+          {isRegister && appMode === 'web' && (
             <div>
               <label style={{ 
                 display: 'block', 

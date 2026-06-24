@@ -21,7 +21,7 @@ export default function DeliveryDashboard() {
     setProfileError('');
     setProfileSaving(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/profile', {
+      const res = await fetch('http://192.168.1.2:5000/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -46,6 +46,18 @@ export default function DeliveryDashboard() {
   const [activeTab, setActiveTab] = useState('available'); // 'available', 'active', 'history'
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // Active/Online toggling state
+  const [isOnline, setIsOnline] = useState(true);
+
+  // Delivery confirmation modal states
+  const [isDeliveryModalOpen, setIsDeliveryModalOpen] = useState(false);
+  const [selectedOrderIdForDelivery, setSelectedOrderIdForDelivery] = useState(null);
+  const [otpCode, setOtpCode] = useState('');
+  const [photoProofUploaded, setPhotoProofUploaded] = useState(false);
+  const [signatureDrawn, setSignatureDrawn] = useState(false);
+  const [canvasCleared, setCanvasCleared] = useState(true);
+
 
   // Notification State
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -82,7 +94,7 @@ export default function DeliveryDashboard() {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch('http://192.168.1.2:5000/api/orders', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -98,7 +110,7 @@ export default function DeliveryDashboard() {
 
   const handleUpdateStatus = async (orderId, newStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`http://192.168.1.2:5000/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +140,8 @@ export default function DeliveryDashboard() {
   const getFilteredOrders = () => {
     switch (activeTab) {
       case 'available':
-        // Accepted by seller, but no delivery partner assigned yet
+        // Accepted by seller, but no delivery partner assigned yet. Hide if offline.
+        if (!isOnline) return [];
         return orders.filter((o) => o.status === 'ACCEPTED' && !o.deliveryPartnerId);
       case 'active':
         // Claimed by this partner and not delivered yet
@@ -159,7 +172,37 @@ export default function DeliveryDashboard() {
             </div>
           </div>
           
-          <div className="flex items-center gap-6" style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }}>
+          <div className="flex items-center gap-6" style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85rem', flexWrap: 'wrap' }}>
+            {/* Active/Online Toggler */}
+            <div 
+              onClick={() => {
+                setIsOnline(!isOnline);
+                toast.success(`You are now ${!isOnline ? 'Online' : 'Offline'}`);
+              }}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                background: isOnline ? 'rgba(76, 175, 80, 0.15)' : 'rgba(244, 67, 54, 0.15)', 
+                padding: '0.5rem 1rem', 
+                border: `1px solid ${isOnline ? '#4CAF50' : '#F44336'}`, 
+                borderRadius: '2px', 
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              <div style={{ 
+                width: '8px', 
+                height: '8px', 
+                borderRadius: '50%', 
+                background: isOnline ? '#4CAF50' : '#F44336',
+                boxShadow: isOnline ? '0 0 8px #4CAF50' : 'none'
+              }}></div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: isOnline ? '#81C784' : '#E57373' }}>
+                {isOnline ? 'ONLINE' : 'OFFLINE'}
+              </span>
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.1)', padding: '0.5rem 1rem', borderRadius: '2px' }}>
               <DollarSign size={16} style={{ color: 'var(--color-secondary)' }} />
               <span>Earnings Balance: <strong>₹{user?.balance?.toLocaleString()}</strong></span>
@@ -449,7 +492,14 @@ export default function DeliveryDashboard() {
 
                   {activeTab === 'active' && order.status === 'IN_TRANSIT' && (
                     <button 
-                      onClick={() => handleUpdateStatus(order.id, 'DELIVERED')}
+                      onClick={() => {
+                        setSelectedOrderIdForDelivery(order.id);
+                        setOtpCode('');
+                        setPhotoProofUploaded(false);
+                        setSignatureDrawn(false);
+                        setCanvasCleared(true);
+                        setIsDeliveryModalOpen(true);
+                      }}
                       className="btn-primary" 
                       style={{ width: '100%', padding: '0.85rem', backgroundColor: 'green', borderColor: 'green' }}
                     >
@@ -582,7 +632,254 @@ export default function DeliveryDashboard() {
                   </button>
                 </div>
               </form>
-            )}
+             )}
+          </div>
+        </div>
+      )}
+
+      {/* Delivery Proof & Verification Modal */}
+      {isDeliveryModalOpen && (
+        <div style={{ 
+          position: 'fixed', 
+          inset: 0, 
+          backgroundColor: 'rgba(0,0,0,0.6)', 
+          zIndex: 300, 
+          display: 'flex', 
+          justifyContent: 'center',
+          alignItems: 'center',
+          backdropFilter: 'blur(4px)',
+          padding: '1.5rem'
+        }}>
+          <div className="card animate-fade-in" style={{ 
+            width: '100%', 
+            maxWidth: '480px', 
+            padding: '2.5rem 2rem', 
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--color-border)',
+            position: 'relative',
+            backgroundColor: 'white',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <button 
+              onClick={() => setIsDeliveryModalOpen(false)} 
+              style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', color: 'var(--color-text-main)', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              <X size={20} />
+            </button>
+            
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <Truck size={36} style={{ color: 'var(--color-secondary)', marginBottom: '0.5rem' }} />
+              <h2 style={{ fontSize: '1.5rem', fontFamily: 'var(--font-serif)', margin: 0 }}>
+                Delivery Completion Proof
+              </h2>
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', margin: '0.25rem 0 0 0' }}>
+                Verify package handover for Batch #ORD-{selectedOrderIdForDelivery?.toString().padStart(5, '0')}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', textAlign: 'left' }}>
+              
+              {/* Step 1: Photo proof */}
+              <div style={{ borderBottom: '1px solid #eee', paddingBottom: '1.25rem' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+                  Step 1: Handover Photo Proof
+                </span>
+                {!photoProofUploaded ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhotoProofUploaded(true);
+                      toast.success('Mock photo proof captured successfully!');
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '1rem',
+                      border: '1px dashed var(--color-secondary)',
+                      background: 'rgba(197, 160, 89, 0.05)',
+                      color: 'var(--color-secondary)',
+                      fontWeight: 600,
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      borderRadius: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    Take Photo / Upload Image proof
+                  </button>
+                ) : (
+                  <div style={{
+                    padding: '0.75rem 1rem',
+                    background: '#E8F5E9',
+                    border: '1px solid #A5D6A7',
+                    borderRadius: '4px',
+                    color: '#2E7D32',
+                    fontSize: '0.8rem',
+                    fontWeight: 500,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <span>✓ Photo proof captured (mock_saree_handover.jpg)</span>
+                    <button 
+                      onClick={() => setPhotoProofUploaded(false)}
+                      style={{ background: 'none', border: 'none', color: '#D32F2F', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      Retake
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Step 2: OTP Verification */}
+              <div style={{ borderBottom: '1px solid #eee', paddingBottom: '1.25rem' }}>
+                <label style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.5rem' }}>
+                  Step 2: Retailer Security OTP
+                </label>
+                <input
+                  type="text"
+                  maxLength={4}
+                  placeholder="Enter 4-digit code (Use 1234)"
+                  value={otpCode}
+                  onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                  style={{
+                    width: '100%',
+                    padding: '0.85rem',
+                    fontSize: '0.9rem',
+                    border: '1px solid var(--color-border)',
+                    outline: 'none',
+                    borderRadius: '2px',
+                    letterSpacing: '4px',
+                    textAlign: 'center'
+                  }}
+                />
+              </div>
+
+              {/* Step 3: Draw digital signature */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase' }}>
+                    Step 3: Retailer Digital Signature
+                  </span>
+                  {signatureDrawn && (
+                    <button 
+                      onClick={() => {
+                        const canvas = document.getElementById('signature-canvas');
+                        if (canvas) {
+                          const ctx = canvas.getContext('2d');
+                          ctx.clearRect(0, 0, canvas.width, canvas.height);
+                          setSignatureDrawn(false);
+                          setCanvasCleared(true);
+                        }
+                      }}
+                      style={{ background: 'none', border: 'none', color: '#D32F2F', fontSize: '0.7rem', fontWeight: 600, cursor: 'pointer' }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+                
+                <div style={{ border: '1px solid var(--color-border)', borderRadius: '4px', overflow: 'hidden', background: '#FAFAFA' }}>
+                  <canvas
+                    id="signature-canvas"
+                    width={400}
+                    height={120}
+                    onMouseDown={(e) => {
+                      const canvas = e.target;
+                      const ctx = canvas.getContext('2d');
+                      ctx.lineWidth = 3;
+                      ctx.lineCap = 'round';
+                      ctx.strokeStyle = '#1A1A1A';
+                      const rect = canvas.getBoundingClientRect();
+                      ctx.beginPath();
+                      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+                      canvas.isDrawing = true;
+                    }}
+                    onMouseMove={(e) => {
+                      const canvas = e.target;
+                      if (!canvas.isDrawing) return;
+                      const ctx = canvas.getContext('2d');
+                      const rect = canvas.getBoundingClientRect();
+                      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                      ctx.stroke();
+                      setSignatureDrawn(true);
+                      setCanvasCleared(false);
+                    }}
+                    onMouseUp={(e) => { e.target.isDrawing = false; }}
+                    onMouseLeave={(e) => { e.target.isDrawing = false; }}
+                    onTouchStart={(e) => {
+                      const canvas = e.target;
+                      const ctx = canvas.getContext('2d');
+                      ctx.lineWidth = 3;
+                      ctx.lineCap = 'round';
+                      ctx.strokeStyle = '#1A1A1A';
+                      const rect = canvas.getBoundingClientRect();
+                      const touch = e.touches[0];
+                      ctx.beginPath();
+                      ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+                      canvas.isDrawing = true;
+                    }}
+                    onTouchMove={(e) => {
+                      const canvas = e.target;
+                      if (!canvas.isDrawing) return;
+                      const ctx = canvas.getContext('2d');
+                      const rect = canvas.getBoundingClientRect();
+                      const touch = e.touches[0];
+                      ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+                      ctx.stroke();
+                      setSignatureDrawn(true);
+                      setCanvasCleared(false);
+                    }}
+                    onTouchEnd={(e) => { e.target.isDrawing = false; }}
+                    style={{ width: '100%', height: '120px', display: 'block', cursor: 'crosshair' }}
+                  />
+                </div>
+                <p style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)', marginTop: '0.35rem', textAlign: 'center' }}>
+                  Draw signature inside the box using touch or mouse pointer
+                </p>
+              </div>
+
+              {/* Action buttons */}
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <button 
+                  type="button" 
+                  onClick={() => setIsDeliveryModalOpen(false)} 
+                  className="btn-secondary" 
+                  style={{ flex: 1, padding: '0.85rem', fontSize: '0.75rem' }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    if (!photoProofUploaded) {
+                      toast.error('Please capture/upload photo proof of delivery.');
+                      return;
+                    }
+                    if (otpCode !== '1234') {
+                      toast.error('Invalid security OTP code. Please ask the retailer for the correct OTP (1234).');
+                      return;
+                    }
+                    if (!signatureDrawn) {
+                      toast.error('Please have the retailer sign to confirm delivery.');
+                      return;
+                    }
+                    
+                    // Call update status
+                    handleUpdateStatus(selectedOrderIdForDelivery, 'DELIVERED');
+                    setIsDeliveryModalOpen(false);
+                  }}
+                  className="btn-primary" 
+                  style={{ flex: 1, padding: '0.85rem', fontSize: '0.75rem', backgroundColor: 'green', borderColor: 'green' }}
+                >
+                  Verify & Settle Payout
+                </button>
+              </div>
+
+            </div>
           </div>
         </div>
       )}

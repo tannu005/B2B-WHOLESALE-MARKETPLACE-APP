@@ -28,7 +28,7 @@ export default function SellerDashboard({ isAdmin = false }) {
     setProfileError('');
     setProfileSaving(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/profile', {
+      const res = await fetch('http://192.168.1.2:5000/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -130,11 +130,11 @@ export default function SellerDashboard({ isAdmin = false }) {
   const fetchCommonData = async () => {
     try {
       // Fetch categories
-      const catRes = await fetch('http://localhost:5000/api/categories');
+      const catRes = await fetch('http://192.168.1.2:5000/api/categories');
       if (catRes.ok) setCategories(await catRes.json());
 
       // Fetch orders (filtered by role by backend)
-      const orderRes = await fetch('http://localhost:5000/api/orders', {
+      const orderRes = await fetch('http://192.168.1.2:5000/api/orders', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (orderRes.ok) setOrders(await orderRes.json());
@@ -148,7 +148,7 @@ export default function SellerDashboard({ isAdmin = false }) {
 
   const fetchSellerProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products/seller', {
+      const res = await fetch('http://192.168.1.2:5000/api/products/seller', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setProducts(await res.json());
@@ -160,19 +160,19 @@ export default function SellerDashboard({ isAdmin = false }) {
   const fetchAdminData = async () => {
     try {
       // Fetch stats
-      const statsRes = await fetch('http://localhost:5000/api/admin/transactions', {
+      const statsRes = await fetch('http://192.168.1.2:5000/api/admin/transactions', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (statsRes.ok) setPlatformStats(await statsRes.json());
 
       // Fetch users
-      const usersRes = await fetch('http://localhost:5000/api/admin/users', {
+      const usersRes = await fetch('http://192.168.1.2:5000/api/admin/users', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (usersRes.ok) setUsersList(await usersRes.json());
 
       // Fetch all products for admin view
-      const prodRes = await fetch('http://localhost:5000/api/products/seller', {
+      const prodRes = await fetch('http://192.168.1.2:5000/api/products/seller', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (prodRes.ok) setProducts(await prodRes.json());
@@ -186,8 +186,8 @@ export default function SellerDashboard({ isAdmin = false }) {
     e.preventDefault();
     try {
       const url = editingProduct 
-        ? `http://localhost:5000/api/products/${editingProduct.id}` 
-        : 'http://localhost:5000/api/products';
+        ? `http://192.168.1.2:5000/api/products/${editingProduct.id}` 
+        : 'http://192.168.1.2:5000/api/products';
       const method = editingProduct ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
@@ -238,7 +238,7 @@ export default function SellerDashboard({ isAdmin = false }) {
   const handleDeleteProduct = async (id) => {
     if (!window.confirm('Are you sure you want to delete this saree?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`http://192.168.1.2:5000/api/products/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -270,7 +270,7 @@ export default function SellerDashboard({ isAdmin = false }) {
   // Order Accept / Reject (Seller)
   const handleOrderStatusUpdate = async (orderId, status) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      const res = await fetch(`http://192.168.1.2:5000/api/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -292,7 +292,7 @@ export default function SellerDashboard({ isAdmin = false }) {
   // Admin Actions
   const handleApproveProduct = async (id, approve) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${id}/approve`, {
+      const res = await fetch(`http://192.168.1.2:5000/api/products/${id}/approve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ export default function SellerDashboard({ isAdmin = false }) {
         payload.commissionRate = parseFloat(rate);
       }
 
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}/approve`, {
+      const res = await fetch(`http://192.168.1.2:5000/api/admin/users/${id}/approve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -346,7 +346,7 @@ export default function SellerDashboard({ isAdmin = false }) {
     if (!newCategoryName.trim()) return;
 
     try {
-      const res = await fetch('http://localhost:5000/api/categories', {
+      const res = await fetch('http://192.168.1.2:5000/api/categories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

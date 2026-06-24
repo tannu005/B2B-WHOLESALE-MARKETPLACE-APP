@@ -1415,7 +1415,6 @@ button {
   .showcase-craft-images {
     height: 400px;
   }
-  }
   .fan-cards {
     display: flex !important;
     overflow-x: auto !important;
@@ -1461,13 +1460,20 @@ button {
   .btn-secondary {
     padding: 0.85rem 1.5rem;
     font-size: 0.7rem;
-    width: 100%;
     text-align: center;
   }
 
-  /* Make grids stack on mobile */
+  /* Category filter buttons should NOT be full-width */
+  .category-filters-container .btn-primary,
+  .category-filters-container .btn-secondary {
+    width: auto !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Make grids stack on mobile — 2 columns for product grid */
   [style*="gridTemplateColumns"] {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1.5rem 1rem !important;
   }
 
   /* Login card - full width on mobile */
@@ -1568,6 +1574,47 @@ button {
     width: calc(100vw - 2rem) !important;
     right: -1rem !important;
   }
+
+  /* Collections section - compact padding on mobile */
+  #collections-section {
+    padding: 3rem 0 5rem 0 !important;
+  }
+  #collections-section > main {
+    padding: 0 0.75rem !important;
+  }
+
+  /* Product cards - compact for 2-column grid */
+  .luxury-product-card {
+    border-radius: 8px;
+  }
+  .luxury-product-image-container {
+    padding-bottom: 130% !important;
+  }
+  .luxury-product-info {
+    padding: 0.75rem 0.5rem 0.5rem !important;
+  }
+  .luxury-product-title {
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+  }
+  .luxury-product-description {
+    font-size: 0.65rem !important;
+    -webkit-line-clamp: 1 !important;
+  }
+  .luxury-product-category {
+    font-size: 0.55rem !important;
+  }
+  .luxury-product-price-row {
+    flex-direction: column !important;
+    gap: 0.15rem !important;
+  }
+  .luxury-price-amount {
+    font-size: 0.8rem !important;
+  }
+  .luxury-product-badge {
+    font-size: 0.5rem !important;
+    padding: 0.2rem 0.4rem !important;
+  }
 }
 
 /* ── Very Small Phones ── */
@@ -1639,3 +1686,36 @@ button {
     flex: unset !important;
   }
 }
+
+/* Category Filters Horizontal Scroll on Mobile */
+.category-filters-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .category-filters-container {
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding: 0.5rem 1rem 1rem 1rem !important;
+    gap: 0.75rem !important;
+    margin-bottom: 2rem !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    scrollbar-width: none; /* Firefox */
+  }
+  .category-filters-container::-webkit-scrollbar {
+    display: none; /* Safari and Chrome */
+  }
+  .category-filters-container button {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-size: 0.7rem !important;
+    padding: 0.6rem 1.2rem !important;
+  }
+}
+
