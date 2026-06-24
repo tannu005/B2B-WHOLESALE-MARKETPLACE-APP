@@ -28,7 +28,7 @@ export default function LandingPage() {
     setProfileError('');
     setProfileSaving(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/profile', {
+      const res = await fetch('http://192.168.1.2:5000/api/auth/profile', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ export default function LandingPage() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/categories');
+      const res = await fetch('http://192.168.1.2:5000/api/categories');
       if (res.ok) {
         const data = await res.json();
         setCategories(data);
@@ -150,7 +150,7 @@ export default function LandingPage() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      let url = 'http://localhost:5000/api/products';
+      let url = 'http://192.168.1.2:5000/api/products';
       const params = [];
       if (selectedCategory) params.push(`category=${encodeURIComponent(selectedCategory)}`);
       if (searchQuery) params.push(`search=${encodeURIComponent(searchQuery)}`);
@@ -172,7 +172,7 @@ export default function LandingPage() {
     if (!token) return;
     setOrderLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/orders', {
+      const res = await fetch('http://192.168.1.2:5000/api/orders', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -300,7 +300,7 @@ export default function LandingPage() {
       }));
 
       // 1. Create Razorpay order on backend
-      const paymentRes = await fetch('http://localhost:5000/api/payments/create-order', {
+      const paymentRes = await fetch('http://192.168.1.2:5000/api/payments/create-order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -325,7 +325,7 @@ export default function LandingPage() {
         handler: async function (response) {
           try {
             // 3. Verify payment and place split orders
-            const checkoutRes = await fetch('http://localhost:5000/api/orders', {
+            const checkoutRes = await fetch('http://192.168.1.2:5000/api/orders', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
