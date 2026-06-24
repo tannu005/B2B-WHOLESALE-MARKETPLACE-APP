@@ -31,8 +31,7 @@
 }
 
 html {
-  overflow-x: hidden;
-  overscroll-behavior: none;
+  /* Removed overflow/overscroll to allow native scrolling */
 }
 
 body {
@@ -42,8 +41,6 @@ body {
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   font-weight: 300;
-  overflow-x: hidden;
-  overscroll-behavior-y: contain;
   -webkit-text-size-adjust: 100%;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
@@ -1475,6 +1472,9 @@ button {
 
 /* ── Mobile Phones ── */
 @media (max-width: 480px) {
+  .hide-on-mobile {
+    display: none !important;
+  }
   .container {
     padding: 0 0.75rem;
   }
@@ -1489,7 +1489,8 @@ button {
 
   /* Hero section - mobile fit */
   header {
-    height: 100svh !important; /* svh = small viewport height, accounts for mobile browser chrome */
+    height: auto !important; 
+    padding-bottom: 2rem;
   }
 
   /* Product cards - single column, full width */
@@ -1569,5 +1570,53 @@ button {
     height: auto !important;
     min-height: 100svh;
     padding: 2rem 0 !important;
+  }
+}
+/* App-specific mobile fixes added via classes */
+@media (max-width: 768px) {
+  .top-announcement-bar {
+    padding-top: calc(max(env(safe-area-inset-top), 24px) + 0.75rem) !important;
+  }
+  .main-nav-bar {
+    padding: 0.75rem 1rem !important;
+  }
+  .mobile-nav-container {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  .mobile-nav-left, .mobile-nav-center, .mobile-nav-right {
+    flex: unset !important;
+  }
+  .mobile-nav-left {
+    order: 1;
+  }
+  .mobile-nav-right {
+    order: 2;
+    margin-left: auto;
+  }
+  .mobile-nav-center {
+    order: 3;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  .mobile-hide-search {
+    display: none !important;
+  }
+  .mobile-logo {
+    font-size: 1.5rem !important;
+  }
+  .mobile-modal {
+    flex-direction: column !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+  }
+  .mobile-modal-image {
+    width: 100% !important;
+    min-height: 250px !important;
+    flex: unset !important;
+  }
+  .mobile-modal-content {
+    padding: 1.5rem !important;
+    flex: unset !important;
   }
 }

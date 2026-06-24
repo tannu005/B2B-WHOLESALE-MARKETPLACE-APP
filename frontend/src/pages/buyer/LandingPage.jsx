@@ -192,6 +192,10 @@ export default function LandingPage() {
 
   // Cart operations
   const addToCart = (product, quantity) => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
     if (product.stock <= 0) {
       toast.error('This item is currently out of stock.');
       return;
@@ -398,19 +402,20 @@ export default function LandingPage() {
       </div>
       
       {/* Navigation Header */}
-      <nav style={{ 
-        padding: '1.5rem 0', 
-        background: 'rgba(250, 248, 245, 0.12)', 
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)',
-        borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
+      {/* Navigation */}
+      <nav className="main-nav-bar" style={{ 
+        padding: '1.5rem 2rem', 
         position: 'sticky', 
         top: 0, 
-        zIndex: 100 
+        zIndex: 100,
+        background: 'rgba(252, 252, 252, 0.85)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(0,0,0,0.05)'
       }}>
-        <div className="container flex items-center justify-between">
-          {/* Left: Collections + Search */}
-          <div className="flex items-center gap-6" style={{ flex: 1, fontFamily: 'var(--font-sans)', fontSize: '0.8rem' }}>
+        <div className="container flex justify-between items-center mobile-nav-container">
+          {/* Left: Collections & Search */}
+          <div className="flex items-center gap-6 mobile-nav-left" style={{ flex: 1, fontFamily: 'var(--font-sans)', fontSize: '0.8rem' }}>
             <button 
               onClick={() => { setSelectedCategory(''); setSearchQuery(''); setViewingOrders(false); }}
               style={{ 
@@ -436,7 +441,7 @@ export default function LandingPage() {
               </button>
             )}
             
-            <form onSubmit={handleSearchSubmit} className="flex items-center" style={{ 
+            <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 mobile-hide-search" style={{ 
               borderBottom: '1px solid var(--color-border)', 
               paddingBottom: '0.25rem',
               marginLeft: '1rem',
@@ -461,9 +466,10 @@ export default function LandingPage() {
           </div>
           
           {/* Center: Viraasat Logo */}
-          <div style={{ flex: 1, textAlign: 'center' }}>
+          <div className="mobile-nav-center" style={{ flex: 1, textAlign: 'center' }}>
             <h2 
               onClick={() => { setSelectedCategory(''); setSearchQuery(''); setViewingOrders(false); }}
+              className="mobile-logo"
               style={{ margin: 0, fontSize: '2rem', letterSpacing: '4px', textTransform: 'uppercase', cursor: 'pointer', display: 'inline-block' }}
             >
               Viraasat
@@ -471,7 +477,7 @@ export default function LandingPage() {
           </div>
 
           {/* Right: User / Auth / Cart */}
-          <div className="flex items-center justify-end gap-6" style={{ flex: 1 }}>
+          <div className="flex items-center justify-end gap-6 mobile-nav-right" style={{ flex: 1 }}>
             {user ? (
               <div className="flex items-center gap-4" style={{ fontFamily: 'var(--font-sans)', fontSize: '0.85rem' }}>
                 <button 
@@ -506,7 +512,10 @@ export default function LandingPage() {
                 <button onClick={logout} style={{ color: '#D32F2F', fontWeight: 500 }}>Sign Out</button>
               </div>
             ) : (
-              <Link to="/login" className="nav-link">Sign In</Link>
+              <Link to="/login" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary)', fontWeight: 500, textDecoration: 'none' }}>
+                <UserIcon size={20} style={{ strokeWidth: 1.5 }} />
+                <span className="nav-link hide-on-mobile">Sign In</span>
+              </Link>
             )}
             
             {/* Bell Icon for Notifications */}
@@ -1220,7 +1229,7 @@ export default function LandingPage() {
           backdropFilter: 'blur(3px)',
           padding: '2rem'
         }}>
-          <div className="card animate-fade-in" style={{ 
+          <div className="card animate-fade-in mobile-modal" style={{ 
             width: '100%', 
             maxWidth: '900px', 
             maxHeight: '90vh', 
@@ -1232,14 +1241,14 @@ export default function LandingPage() {
             border: '1px solid var(--color-border)'
           }}>
             {/* Left Image */}
-            <div style={{ 
+            <div className="mobile-modal-image" style={{ 
               flex: 1, 
               minHeight: '500px',
               background: `url("${selectedProduct.imageUrl || '/hero.png'}") center/cover no-repeat` 
             }}></div>
 
             {/* Right details */}
-            <div style={{ flex: 1.2, padding: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div className="mobile-modal-content" style={{ flex: 1.2, padding: '3rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div className="flex justify-between items-start">
                 <div>
                   <p style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--color-text-muted)', marginBottom: '0.25rem' }}>
