@@ -653,7 +653,7 @@ export default function LandingPage() {
               maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)'
             }}>
               <div style={{ position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.18)' }}></div>
-              <div className="animate-fade-in" style={{ 
+              <div className="animate-fade-in hero-card" style={{ 
                 position: 'relative', 
                 zIndex: 1, 
                 textAlign: 'center', 

@@ -1489,8 +1489,14 @@ button {
 
   /* Hero section - mobile fit */
   header {
-    height: auto !important; 
-    padding-bottom: 2rem;
+    height: 100svh !important; 
+  }
+  .hero-card {
+    padding: 2.5rem 1.5rem !important;
+    margin: 0 1.5rem !important;
+  }
+  .hero-card h1 {
+    font-size: 2.5rem !important;
   }
 
   /* Product cards - single column, full width */
@@ -1564,12 +1570,10 @@ button {
   }
 }
 
-/* ── Landscape Mobile ── */
+/* 📱 Landscape Mobile 📱 */
 @media (max-height: 500px) and (orientation: landscape) {
   header {
-    height: auto !important;
-    min-height: 100svh;
-    padding: 2rem 0 !important;
+    height: 100svh !important;
   }
 }
 /* App-specific mobile fixes added via classes */
