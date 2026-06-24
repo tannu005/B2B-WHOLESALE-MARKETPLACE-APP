@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Capacitor & Build Outputs
+android/
+apks/
+build-apks.ps1

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ShoppingBag, Search, Menu, X, Plus, Minus, Trash2, ArrowRight, User as UserIcon, Clock, CheckCircle, Truck, RefreshCw, Bell } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -53,6 +53,11 @@ export default function LandingPage() {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [address, setAddress] = useState('');
+
+  // Orders State (declared early so notifications can derive from it)
+  const [orders, setOrders] = useState([]);
+  const [viewingOrders, setViewingOrders] = useState(false);
+  const [orderLoading, setOrderLoading] = useState(false);
   
   // Notification State
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -92,10 +97,7 @@ export default function LandingPage() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [detailQty, setDetailQty] = useState(1);
 
-  // Orders State
-  const [orders, setOrders] = useState([]);
-  const [viewingOrders, setViewingOrders] = useState(false);
-  const [orderLoading, setOrderLoading] = useState(false);
+  // (Orders state is declared above, before notifications)
 
   // Fetch categories once on mount
   useEffect(() => {
@@ -116,6 +118,22 @@ export default function LandingPage() {
       fetchOrders();
     }
   }, [user]);
+
+  // Scroll-reveal IntersectionObserver for editorial sections
+  useEffect(() => {
+    const revealEls = document.querySelectorAll('.reveal');
+    if (!revealEls.length) return;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealEls.forEach(el => io.observe(el));
+    return () => io.disconnect();
+  });
 
   const fetchCategories = async () => {
     try {
@@ -364,7 +382,7 @@ export default function LandingPage() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--color-background)' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Minimalist Top Promotion Nav */}
       <div style={{ 
         background: 'var(--color-primary)', 
@@ -597,19 +615,33 @@ export default function LandingPage() {
       </nav>
 
       {/* Main Content Area */}
+      {/* Global Hero Background (Fixed behind EVERYTHING - always visible) */}
+      <div style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'url("/hero.png") center/cover no-repeat',
+        filter: 'blur(16px)',
+        transform: 'scale(1.1)',
+        zIndex: -1,
+        pointerEvents: 'none'
+      }}></div>
+
       {!viewingOrders ? (
         <>
+
           {/* Hero Banner */}
           {!selectedCategory && !searchQuery && (
             <header style={{ 
-              height: '80vh', 
+              height: '100vh', 
               width: '100%',
-              background: 'url("/hero.png") center/cover no-repeat',
               position: 'relative',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginTop: '-88px'
+              marginTop: '-88px',
+              background: 'url("/hero.png") center/cover no-repeat fixed',
+              WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)',
+              maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 85%, rgba(0,0,0,0) 100%)'
             }}>
               <div style={{ position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.18)' }}></div>
               <div className="animate-fade-in" style={{ 
@@ -637,8 +669,119 @@ export default function LandingPage() {
             </header>
           )}
 
+          {/* ═══ EDITORIAL SHOWCASE SECTIONS ═══ */}
+          {!selectedCategory && !searchQuery && (
+            <>
+              {/* Section 1: Born From Craft */}
+              <section className="showcase-craft">
+                <div className="showcase-craft-inner reveal">
+                  <div className="showcase-craft-images">
+                    <div className="showcase-craft-img back">
+                      <img src="/patola.png" alt="Patola Silk" />
+                    </div>
+                    <div className="showcase-craft-img front">
+                      <img src="/banarasi.png" alt="Banarasi Heritage" />
+                    </div>
+                  </div>
+                  <div className="showcase-craft-text">
+                    <h2>Born From Craft,<br />Guided By Quality</h2>
+                    <ul>
+                      <li>Authentic handloom sarees sourced directly from master weavers</li>
+                      <li>Premium silk, cotton & heritage fabrics with centuries-old techniques</li>
+                      <li>Limited-edition heritage drops curated from India's finest looms</li>
+                      <li>Exclusive wholesale pricing for boutique retailers</li>
+                      <li>Every thread traceable to its artisan origin</li>
+                    </ul>
+                    <button className="craft-cta" onClick={() => {
+                      document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }}>
+                      Explore Collection
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 2: Full-Width Editorial Banner */}
+              <section className="showcase-editorial reveal" style={{ height: '70vh' }}>
+                <div className="showcase-editorial-bg">
+                  <img src="/tissue.png" alt="Heritage Craftsmanship" />
+                </div>
+                <div className="showcase-editorial-content">
+                  <h2>Sustainable Craft.<br />Ethical Weave.<br />100% Heritage.</h2>
+                  <p>
+                    Our heritage-inspired collections are woven to last, combining time-honored
+                    techniques with conscious craftsmanship. Every saree supports the livelihood
+                    of artisan weavers across India's handloom heartlands.
+                  </p>
+                </div>
+              </section>
+
+              {/* Section 3: Follow The Drape */}
+              <section className="showcase-fan">
+                <h2 className="reveal">Follow The Drape</h2>
+                <p className="fan-subtitle">
+                  Become a part of our vibrant community, where tradition meets modern elegance.
+                  Discover heritage weaves, celebrate artisan craft, and drape yourself in stories
+                  woven through generations.
+                </p>
+                <div className="fan-cards reveal">
+                  <div className="fan-card" onClick={() => { setSelectedCategory(''); document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                    <img src="/kanjeevaram.png" alt="Kanjeevaram Green" />
+                    <div className="fan-card-label">Kanjeevaram Green</div>
+                  </div>
+                  <div className="fan-card" onClick={() => { setSelectedCategory(''); document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                    <img src="/patola.png" alt="Patola Maroon" />
+                    <div className="fan-card-label">Patola Maroon</div>
+                  </div>
+                  <div className="fan-card" onClick={() => { setSelectedCategory(''); document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                    <img src="/banarasi.png" alt="Banarasi Blue" />
+                    <div className="fan-card-label">Banarasi Blue</div>
+                  </div>
+                  <div className="fan-card" onClick={() => { setSelectedCategory(''); document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                    <img src="/tissue.png" alt="Tissue Ivory" />
+                    <div className="fan-card-label">Tissue Ivory</div>
+                  </div>
+                  <div className="fan-card" onClick={() => { setSelectedCategory(''); document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
+                    <img src="/mysore.png" alt="Mysore Crepe Silk" />
+                    <div className="fan-card-label">Mysore Crepe Silk</div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Section 4: Featured Collections */}
+              <section className="showcase-scroll">
+                <div className="showcase-scroll-header reveal">
+                  <h2>We Weave Heritage,<br />Even Sharper</h2>
+                  <p>Explore our signature curated collections — swipe to discover</p>
+                </div>
+                <div className="scroll-track reveal">
+                  {[
+                    { img: '/bridal.png', title: 'Bridal Grandeur Collection' },
+                    { img: '/kanchi.png', title: 'Kanchipuram Temple Gold' },
+                    { img: '/mysore.png', title: 'Mysore Royal Crepe' },
+                    { img: '/kashmiri.png', title: 'Kashmir Valley Pashmina' },
+                    { img: '/georgette.png', title: 'Georgette Elegance' },
+                    { img: '/chanderi.png', title: 'Chanderi Moonlight' },
+                    { img: '/jamdani.png', title: 'Jamdani Heritage Muslin' },
+                    { img: '/organza.png', title: 'Organza Silk Bloom' },
+                  ].map((item, i) => (
+                    <div key={i} className="scroll-card" onClick={() => {
+                      document.getElementById('collections-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }}>
+                      <div className="scroll-card-img">
+                        <img src={item.img} alt={item.title} />
+                      </div>
+                      <div className="scroll-card-title">{item.title}</div>
+                      <button className="scroll-card-cta">Shop Now</button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            </>
+          )}
+
           {/* Category Tabs & Grid */}
-          <section id="collections-section" style={{ background: 'linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%)', padding: '5rem 0 8rem 0' }}>
+          <section id="collections-section" style={{ background: 'rgba(255, 255, 255, 0.15)', backdropFilter: 'blur(8px)', padding: '5rem 0 8rem 0' }}>
             <main className="container" style={{ padding: 0 }}>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
               <button 
@@ -746,7 +889,7 @@ export default function LandingPage() {
       </>
       ) : (
         /* Order History Page */
-        <main className="container animate-fade-in" style={{ padding: '4rem 2rem 8rem', flex: 1 }}>
+        <main className="container animate-fade-in" style={{ padding: '4rem 2rem 8rem', flex: 1, background: 'rgba(255, 255, 255, 0.25)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}>
           <div className="flex justify-between items-center" style={{ marginBottom: '3rem' }}>
             <div>
               <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Order History</h1>
@@ -881,22 +1024,13 @@ export default function LandingPage() {
       )}
 
       {/* Footer */}
-      <footer style={{ marginTop: 'auto', background: '#111', color: 'white', padding: '4rem 0', borderTop: '1px solid var(--color-primary)' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4rem', fontSize: '0.85rem', fontFamily: 'var(--font-sans)' }}>
+      <footer style={{ marginTop: 'auto', background: 'rgba(17, 17, 17, 0.75)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', color: 'white', padding: '4rem 0', borderTop: '1px solid rgba(197, 160, 89, 0.3)' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '4rem', fontSize: '0.85rem', fontFamily: 'var(--font-sans)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <h3 style={{ color: 'white', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem' }}>Viraasat</h3>
             <p style={{ color: '#aaa', lineHeight: 1.6 }}>
               Preserving Indian handloom legacies by connecting authentic weavers and boutique retailers. Fully automated B2B wholesale commerce.
             </p>
-          </div>
-          <div>
-            <h4 style={{ color: 'var(--color-secondary)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.5rem' }}>Role Access</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <Link to="/login" style={{ color: '#aaa' }}>Admin Portal</Link>
-              <Link to="/login" style={{ color: '#aaa' }}>Weaver Dashboard</Link>
-              <Link to="/login" style={{ color: '#aaa' }}>Retailer Lounge</Link>
-              <Link to="/login" style={{ color: '#aaa' }}>Logistics Partner app</Link>
-            </div>
           </div>
           <div>
             <h4 style={{ color: 'var(--color-secondary)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1.5rem' }}>Core Office</h4>

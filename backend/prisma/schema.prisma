@@ -24,6 +24,7 @@ model User {
   deliveries     Order[]   @relation("DeliveryPartner")
   sellerOrders   Order[]   @relation("SellerOrders")
   products       Product[] @relation("SellerProducts")
+  complaints     Complaint[]
 }
 
 model Category {
@@ -81,3 +82,13 @@ model OrderItem {
   priceAtBuy Float
 }
 
+model Complaint {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  subject     String
+  message     String
+  status      String   @default("OPEN") // "OPEN", "RESOLVED"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

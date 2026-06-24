@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/buyer/LandingPage';
 import SellerDashboard from './pages/seller/SellerDashboard';
@@ -11,19 +11,7 @@ function ProtectedRoute({ children, allowedRoles }) {
   const { user, loading } = useAuth();
   
   if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh', 
-        fontFamily: 'var(--font-serif)', 
-        fontSize: '2rem',
-        color: 'var(--color-primary)'
-      }}>
-        VIRAASAT
-      </div>
-    );
+    return null; // splash screen handles the loading visual
   }
   
   if (!user) {
@@ -39,6 +27,27 @@ function ProtectedRoute({ children, allowedRoles }) {
 }
 
 function App() {
+  const [splashDone, setSplashDone] = useState(false);
+
+  useEffect(() => {
+    const splash = document.getElementById('splash-screen');
+    if (!splash) { setSplashDone(true); return; }
+
+    // Wait at least 2s so the scale-up animation plays fully,
+    // then fade-out via CSS transition and remove from DOM.
+    const minDelay = setTimeout(() => {
+      splash.classList.add('hide');
+      // After the 0.6s CSS fade-out transition finishes, remove from DOM
+      const cleanup = setTimeout(() => {
+        splash.remove();
+        setSplashDone(true);
+      }, 650);
+      return () => clearTimeout(cleanup);
+    }, 2000);
+
+    return () => clearTimeout(minDelay);
+  }, []);
+
   return (
     <ToastProvider>
       <Router>
