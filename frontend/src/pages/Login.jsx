@@ -111,15 +111,6 @@ export default function Login({ appMode = 'web', setAppMode }) {
     }
   };
 
-  // Helper for localhost mode switching
-  const handleDevModeSwitch = (mode) => {
-    if (setAppMode) {
-      setAppMode(mode);
-      localStorage.setItem('dev_app_mode', mode);
-      setRole(mode === 'seller' ? 'SELLER' : mode === 'delivery' ? 'DELIVERY' : 'RETAILER');
-      setError('');
-    }
-  };
 
   return (
     <div style={{
@@ -141,25 +132,6 @@ export default function Login({ appMode = 'web', setAppMode }) {
         </Link>
       ) : null}
       
-      {/* Dev Mode Switcher on Localhost */}
-      {!window.Capacitor?.isNative && (
-        <div style={{
-          position: 'absolute',
-          top: '1rem',
-          right: '1rem',
-          background: 'rgba(0,0,0,0.8)',
-          padding: '0.75rem',
-          borderRadius: '4px',
-          display: 'flex',
-          gap: '0.5rem',
-          zIndex: 100
-        }}>
-          <span style={{ color: '#aaa', fontSize: '0.75rem', alignSelf: 'center', marginRight: '0.25rem' }}>Dev Mode:</span>
-          <button onClick={() => handleDevModeSwitch('buyer')} style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', background: appMode === 'buyer' ? 'var(--color-secondary)' : '#333', color: 'white', border: 'none', borderRadius: '2px', cursor: 'pointer' }}>Buyer</button>
-          <button onClick={() => handleDevModeSwitch('seller')} style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', background: appMode === 'seller' ? 'var(--color-secondary)' : '#333', color: 'white', border: 'none', borderRadius: '2px', cursor: 'pointer' }}>Seller/Admin</button>
-          <button onClick={() => handleDevModeSwitch('delivery')} style={{ padding: '0.25rem 0.5rem', fontSize: '0.7rem', background: appMode === 'delivery' ? 'var(--color-secondary)' : '#333', color: 'white', border: 'none', borderRadius: '2px', cursor: 'pointer' }}>Delivery</button>
-        </div>
-      )}
       
       <div className="card animate-fade-in" style={{
         width: '100%',
@@ -410,7 +382,7 @@ export default function Login({ appMode = 'web', setAppMode }) {
             </div>
           </div>
 
-          {isRegister && appMode === 'web' && (
+          {isRegister && (appMode === 'web' || appMode === 'buyer') && (
             <div>
               <label style={{ 
                 display: 'block', 
